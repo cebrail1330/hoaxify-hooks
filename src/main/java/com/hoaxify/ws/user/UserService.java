@@ -1,6 +1,7 @@
 package com.hoaxify.ws.user;
 
 
+import com.hoaxify.ws.error.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,4 +33,13 @@ public class UserService {
         }
         return userRepository.findAll(page); //sayfalandırma yapacak
     }
+
+    public User getByUsername(String username) {
+        User inDB = userRepository.findByUsername(username);
+        if(inDB == null){
+            throw new NotFoundException();
+        }
+        return inDB;
+    }
+
 }
