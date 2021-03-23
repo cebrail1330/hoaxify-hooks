@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {getUsers} from "../api/apiCalls";
 import {useTranslation} from "react-i18next";
 import UserListItem from "./UserListItem";
+import {useApiProgress} from "../shared/ApiProgress";
 
 const UserList = () => {
     const [page, setPage] = useState({
@@ -9,6 +10,9 @@ const UserList = () => {
         number: 0,
         size: 3
     });
+
+    const [loadFailure, setLoadFailure] = useState(false);
+    const pendingApiCall = useApiProgress('/api/1.0/users?page');
 
     useEffect(() => {
         loadUsers();//bu şekillde çağrılırda default değerlerle çalışacak
@@ -23,14 +27,42 @@ const UserList = () => {
         loadUsers(previousPage);
     }
 
-    const loadUsers = page => {
-        getUsers(page).then(response => {
+    const loadUsers = async page => {
+        setLoadFailure(false);
+        try {
+            const response = await getUsers(page);
             setPage(response.data);
-        })
-    }
+        } catch (error) {
+            setLoadFailure(true);
+        }
 
+    }
     const {content: users, last, first} = page; //content: users content'in yeni ismi
     const {t} = useTranslation();
+
+    let actionDiv = (
+        <div>
+            {/* sayfalandırma arası geçiş page'nin içinde first last geliyor*/}
+            {first === false &&
+            <button className="btn btn-sm btn-light" onClick={onClickPrevious}>{t('Previous')}</button>}
+
+            {/**last === false bu kontrol olmazsa eğer backend'den hiç bir sonuç gelmezse yine false olur*/}
+            {last === false &&
+            <button className="btn btn-sm btn-light float-right"
+                    onClick={onClickNext}>{t('Next')}</button>}
+        </div>
+    )
+    if (pendingApiCall) {
+        actionDiv = (
+            <div className="d-flex justify-content-center">
+                <div className="spinner-border text-black-50">
+                    <span className="sr-only">Loading...</span>
+                </div>
+            </div>
+        )
+    }
+
+
     return (
         <div className="card">
             <h3 className="card-header text-center">{t('Users')}</h3>
@@ -41,17 +73,10 @@ const UserList = () => {
                     ))
                 }
             </div>
-            <div>
-                {/* sayfalandırma arası geçiş page'nin içinde first last geliyor*/}
-                {first === false &&
-                <button className="btn btn-sm btn-light" onClick={onClickPrevious}>{t('Previous')}</button>}
-
-                {/**last === false bu kontrol olmazsa eğer backend'den hiç bir sonuç gelmezse yine false olur*/}
-                {last === false &&
-                <button className="btn btn-sm btn-light float-right"
-                        onClick={onClickNext}>{t('Next')}</button>}
-            </div>
-
+            {actionDiv}
+            {loadFailure && <div className="text-center text-danger">
+                {t('Load Failure')}
+            </div>}
         </div>
     );
 

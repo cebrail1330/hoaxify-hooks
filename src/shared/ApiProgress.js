@@ -11,7 +11,7 @@ export const useApiProgress = (apiPath) => {
 
         const updateApiCallFor = (url, inProgress) => {
             // if (url.startsWith(apiPath)) {
-            if (url === apiPath) {
+            if (url.startsWith( apiPath)) {
                 setPendingApiCall(inProgress);
             }
         }
