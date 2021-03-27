@@ -16,7 +16,12 @@ i18n.use(initReactI18next).init({
                 Users: 'Users',
                 Next: 'next >',
                 Previous :'< previous',
-                'Load Failure': 'Load Failure'
+                'Load Failure': 'Load Failure',
+                'User not Found': 'User not Found',
+                Edit: 'Edit',
+                Save: 'Save',
+                Cancel: 'Cancel',
+                "Change Display Name": "Change Display Name"
             }
         },
         tr:{
@@ -32,7 +37,12 @@ i18n.use(initReactI18next).init({
                 Users: 'Kullanıcılar',
                 Next: 'sonraki >',
                 Previous :'< önceki',
-                'Load Failure': 'Liste alınamadı'
+                'Load Failure': 'Liste alınamadı',
+                'User not Found': 'Kullanıcı bulunamadı',
+                Edit: 'Düzenle',
+                Save: 'Kaydet',
+                Cancel: 'iptal et',
+                "Change Display Name": "Görünür isminizi değiştirin"
             }
 
         }
