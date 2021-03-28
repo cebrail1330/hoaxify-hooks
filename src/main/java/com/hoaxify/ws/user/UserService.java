@@ -2,6 +2,7 @@ package com.hoaxify.ws.user;
 
 
 import com.hoaxify.ws.error.NotFoundException;
+import com.hoaxify.ws.user.vm.UserUpdateVM;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,4 +43,12 @@ public class UserService {
         return inDB;
     }
 
+    public User updateUser(String username, UserUpdateVM updatedUser) {
+        User inDb = getByUsername(username); //üsteki metoddan userName getirecek
+        inDb.setDisplayName(updatedUser.getDisplayName());//yeni displayname eklenecek
+        if(updatedUser.getImage() != null){
+            inDb.setImage(updatedUser.getImage());
+        }
+        return userRepository.save(inDb);
+    }
 }
