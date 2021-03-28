@@ -3,7 +3,7 @@ import defaultPicture from "../assets/profile.png";
 
 const ProfileImageWithDefault = (props) => {
 
-    const {image} = props;
+    const {image, tepimage} = props;
 
     let imageSource = defaultPicture;
     if (image) {
@@ -12,7 +12,7 @@ const ProfileImageWithDefault = (props) => {
 
     return (
         <img className="rounded-circle shadow" {...props}
-             alt={`profile`} src={imageSource}/>
+             alt={`profile`} src={tepimage || imageSource}/>
             
 
     );
