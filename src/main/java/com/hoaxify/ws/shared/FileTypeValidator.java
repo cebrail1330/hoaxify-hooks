@@ -1,50 +1,44 @@
 package com.hoaxify.ws.shared;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.hoaxify.ws.file.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+public class FileTypeValidator implements ConstraintValidator<FileType, String> {
 
-import com.hoaxify.ws.file.FileService;
+    @Autowired
+    FileService fileService;
 
-public class FileTypeValidator implements ConstraintValidator<FileType, String>{
+    String[] types;
 
-	@Autowired
-	FileService fileService;
-	
-	String[] types;
-	
-	@Override
-	public void initialize(FileType constraintAnnotation) {
-		this.types = constraintAnnotation.types();
-		
-	} 
-	
-	@Override
-	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if(value == null || value.isEmpty()) {
-			return true;
-		}
-		String fileType = fileService.detectType(value);
-		for(String supportedType: this.types) {
-			if(fileType.contains(supportedType)) {
-				return true;
-			}
-		}
-		//hata mesajlarındaki jpg png ifadelerini virgülle birleştirecek
+    @Override
+    public void initialize(FileType constraintAnnotation) {
+        this.types = constraintAnnotation.types();
+
+    }
+
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null || value.isEmpty()) {
+            return true;
+        }
+        String fileType = fileService.detectType(value);
+        for (String supportedType : this.types) {
+            if (fileType.contains(supportedType)) {
+                return true;
+            }
+        }
+        //hata mesajlarındaki jpg png ifadelerini virgülle birleştirecek
 		/*String supportedTypes = Arrays.stream(this.types).collect(Collectors.joining(", "));
 		context.disableDefaultConstraintViolation();
 		HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context.unwrap(HibernateConstraintValidatorContext.class);
 		hibernateConstraintValidatorContext.addMessageParameter("types", supportedTypes);
 		hibernateConstraintValidatorContext.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addConstraintViolation();
 		*/
-		return false;
-	}
-	
+        return false;
+    }
+
 
 }
