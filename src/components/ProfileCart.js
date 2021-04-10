@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from "react-redux";
+import { useSelector, useDispatch} from "react-redux";
 import {useParams} from "react-router-dom";
 import ProfileImageWithDefault from "./ProfileImageWithDefault";
 import {useTranslation} from "react-i18next";
@@ -7,6 +7,7 @@ import Input from "./Input";
 import {updateUser} from "../api/apiCalls";
 import {useApiProgress} from "../shared/ApiProgress";
 import ButtonWithProgress from "./ButtonWithProgress";
+import {updateSuccess} from "../redux/authActions";
 //userpage.js deki props bilgilerini alacak
 
 const ProfileCart = (props) => {
@@ -14,16 +15,31 @@ const ProfileCart = (props) => {
     const [newImage, setNewImage] = useState();
     const [user, setUser] = useState({});
     const [editable, setEditable] = useState(false)
-
-
+    const [validationErrors, setValidationErrors] = useState({});
+    const [updatedDisplayName, setUpdatedDisplayName] = useState();
     const {username, displayName, image} = user;
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
         setUser(props.user)
     }, [props.user])
 
-    const [updatedDisplayName, setUpdatedDisplayName] = useState();
+    useEffect(() => { //hatadan sonra yeni bir şey girildiğinde gelen hatanın içindeki displayname i temizleyecek
+        setValidationErrors(previousValitationErrors => ({
+            ...previousValitationErrors,
+            displayName: undefined
+        }));
+    }, [updatedDisplayName])
+
+    useEffect(() => {
+        setValidationErrors(previousValitationErrors => ({
+            ...previousValitationErrors,
+            image: undefined
+        }));
+    }, [newImage])
+
+
     const {username: loggedInUsername} = useSelector(store => ({
         username: store.username
     }))
@@ -42,19 +58,24 @@ const ProfileCart = (props) => {
     }, [pathUsername, loggedInUsername])
 
     const {t} = useTranslation()
+
     const onClickSave = async () => {
+        let image;
+        if (newImage) {
+            image = newImage.split(',')[1]
+        }
         const body = {
             displayName: updatedDisplayName,
-            image: newImage
+            image
         };
         try {
             const response = await updateUser(username, body);
             setInEditMode(false);
-            setUser(response.data)
-        } catch (e) {
-
+            setUser(response.data);
+            dispatch(updateSuccess(response.data))
+        } catch (err) {
+            setValidationErrors(err.response.data.validationErrors);
         }
-        console.log(updatedDisplayName)
     }
 
     useEffect(() => {
@@ -67,13 +88,19 @@ const ProfileCart = (props) => {
     }, [inEditMode, displayName])
 
     const onChangefile = event => {
+        if (event.target.files.length < 1) {
+            return;
+        }
         const file = event.target.files[0];
         const fileReader = new FileReader();
-        fileReader.onloadend =()=>{
+        fileReader.onloadend = () => {
             setNewImage(fileReader.result);
         }
         fileReader.readAsDataURL(file);
+
     }
+
+    const {displayName: displayNameError, image: imageError} = validationErrors;
     return (
         <div className="card text-center">
             <div className="card-header">
@@ -98,10 +125,16 @@ const ProfileCart = (props) => {
                     </>)}
                 {inEditMode && (
                     <div>
-                        <Input label={t("Change Display Name")} defaultValue={displayName} onChange={(event) => {
-                            setUpdatedDisplayName(event.target.value)
-                        }}/>
-                        <input type="file" onChange={onChangefile}/>
+                        <Input label={t("Change Display Name")}
+                               defaultValue={displayName}
+                               onChange={(event) => {
+                                   setUpdatedDisplayName(event.target.value)
+                               }}
+                               error={displayNameError}
+                        />
+                        <Input type="file"
+                               error={imageError}
+                               onChange={onChangefile}/>
                         <div>
                             <ButtonWithProgress
                                 className="btn btn-primary d-inline-flex"

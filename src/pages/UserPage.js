@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import ProfileCart from "../components/ProfileCart";
 import {getUser} from "../api/apiCalls";
 import {useTranslation} from "react-i18next";
-import {useApiProgress} from "../shared/ApiProgress";
 import Spinner from "../components/Spinner";
 import {useParams} from "react-router-dom";
 
@@ -13,7 +12,8 @@ const UserPage = (props) => {
     const {username} = useParams()  // || props.match.params
     const {t} = useTranslation();
 
-    const pendingApiCall = useApiProgress('get', '/api/1.0/users/' + username);
+    const pendingApiCall =
+        ('get', '/api/1.0/users/' + username);
 
     useEffect(() => { //userlar gelirse hata gösterilmeyecek
         setNotFound(false);
