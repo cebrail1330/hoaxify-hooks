@@ -9,8 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.Base64;
+import java.io.IOException;
 
 //ara katman
 @Service
@@ -22,7 +21,7 @@ public class UserService {
 
     FileService fileService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,  FileService fileService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
@@ -44,7 +43,7 @@ public class UserService {
 
     public User getByUsername(String username) {
         User inDB = userRepository.findByUsername(username);
-        if(inDB == null){
+        if (inDB == null) {
             throw new NotFoundException();
         }
         return inDB;
@@ -53,8 +52,8 @@ public class UserService {
     public User updateUser(String username, UserUpdateVM updatedUser) {
         User inDb = getByUsername(username); //üsteki metoddan userName getirecek
         inDb.setDisplayName(updatedUser.getDisplayName());//yeni displayname eklenecek
-        if(updatedUser.getImage() != null){
-        	String oldImageName = inDb.getImage();
+        if (updatedUser.getImage() != null) {
+            String oldImageName = inDb.getImage();
             //inDb.setImage(updatedUser.getImage());
 
             //Dosyaya kaydetme işlemi yapılacak
@@ -64,11 +63,17 @@ public class UserService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            fileService.deleteFile(oldImageName);
+            fileService.deleteProfileImage(oldImageName);
 
         }
         return userRepository.save(inDb);
     }
 
+    public void deleteUser(String username) {
+        User inDB = userRepository.findByUsername(username);
+        //fileService.deleteProfileImage(inDB.getImage());
+        fileService.deleteAllStoredFilesForUser(inDB);
+        userRepository.delete(inDB);
+    }
 
 }

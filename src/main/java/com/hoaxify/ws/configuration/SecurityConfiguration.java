@@ -29,10 +29,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		//browserın açtığı header kaldırmak için kendi authenticationEntryPoint'ımızı yazdık
 		http.httpBasic().authenticationEntryPoint(new AuthEntryPoint());
 		
+		http.headers().frameOptions().disable();
+		
 		//gelen requestin doğru almasını sağlar
 		http.authorizeRequests()
 				.antMatchers(HttpMethod.POST, "/api/1.0/auth").authenticated()
 				.antMatchers(HttpMethod.PUT, "/api/1.0/users/{username}").authenticated()
+				.antMatchers(HttpMethod.POST, "/api/1.0/hoaxes").authenticated()
+				.antMatchers(HttpMethod.POST, "/api/1.0/hoax-attachments").authenticated()
 		.and()
 		.authorizeRequests().anyRequest().permitAll();//bunun dışında kalan herhangi bir request'e bakmayacak
 		
