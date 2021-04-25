@@ -8,7 +8,7 @@ const secureLs = new SecureLS();
 
 const getStateFromStorage = () => {
     //sayfa yenilendiğinde veriler kaybolmaması için
-    const hoaxauth = secureLs.get('hoax-auth');
+    const hoaxauth = secureLs.get('com.hoaxify.ws.hoax-auth');
 
     //localStorage'da herhangi bir bilgi yoksa
     let stateInLocalStorage = {
@@ -25,7 +25,7 @@ const getStateFromStorage = () => {
 
 const updateStateInstorage = (newState) => {
     // store'ın özelliğini kullanarak değişimleri key'le beraber localStorage'ye attık
-    secureLs.set('hoax-auth', newState)
+    secureLs.set('com.hoaxify.ws.hoax-auth', newState)
 }
 
 const configureStore = () => {
