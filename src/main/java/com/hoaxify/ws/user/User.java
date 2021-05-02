@@ -1,5 +1,6 @@
 package com.hoaxify.ws.user;
 
+import com.hoaxify.ws.auth.Token;
 import com.hoaxify.ws.hoax.Hoax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,9 +22,7 @@ import java.util.List;
 @Entity //database oluşturması için
 
 public class User implements UserDetails {
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -50,6 +49,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Hoax> hoaxes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
